@@ -1,4 +1,5 @@
 import { Schema, model } from 'mongoose'
+import validator from 'validator'
 
 // 定義資料庫的資料結構包含那些欄位
 const schema = new Schema({
@@ -17,8 +18,19 @@ const schema = new Schema({
     match: [/^[A-Za-z1-9]+$/, 'account 只能是英文或數字'],
     // 自動去除前後空白
     trim: true
+  },
+  email: {
+    type: String,
+    required: [true, '缺少 email 欄位'],
+    unique: true,
+    validator: {
+      // 自定驗證
+      validator (value) {
+        return validator.isEmail(value)
+      }
+      // 自訂錯誤訊息
+    }
   }
-
 })
 
 // 將結構轉換成可操作的model物件匯出
