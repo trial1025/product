@@ -1,4 +1,4 @@
-import { Schema, model, ObjectId } from 'mongoose'
+import { Schema, model, ObjectId, Error } from 'mongoose'
 import validator from 'validator'
 import bcrypt from 'bcryptjs'
 import UserRole from '../enums/UserRole'
@@ -10,6 +10,7 @@ const cartSchema = new Schema({
     required: [true, '缺少商品欄位']
   }
 })
+
 const schema = new Schema({
   account: {
     type: String,
@@ -49,6 +50,23 @@ const schema = new Schema({
     type: Number,
     default: UserRole.USER
   }
+}, {
+  timestamps: true,
+  versionKey: false
+})
+
+schema.pre('save', function (next) {
+  const user = this
+  if (user.isModified('password')) {
+    if (user.password.length < 4 || user.password.length > 20) {
+      const error = new Error.ValidationError(null)
+      error.addError('password', new Error.ValidationError({ message: '密碼長度不符' }))
+      next(error)
+    } else {
+      user.password = bcrypt.hashSync(user.password, 10)
+    }
+  }
+  next()
 })
 
 export default model('user', schema)
