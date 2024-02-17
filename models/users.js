@@ -1,13 +1,17 @@
 import { Schema, model, ObjectId, Error } from 'mongoose'
 import validator from 'validator'
-import bcrypt from 'bcryptjs'
-import UserRole from '../enums/UserRole'
+import bcrypt from 'bcrypt'
+import UserRole from '../enums/UserRole.js'
 
 const cartSchema = new Schema({
   product: {
     type: ObjectId,
-    ref: 'product',
+    ref: 'products',
     required: [true, '缺少商品欄位']
+  },
+  quantity: {
+    type: Number,
+    required: [true, '缺少商品數量']
   }
 })
 
@@ -15,32 +19,32 @@ const schema = new Schema({
   account: {
     type: String,
     required: [true, '缺少使用者帳號'],
-    minlength: [4, '帳號長度不得小於4'],
-    maxlength: [20, '帳號長度不得大於20'],
+    minlength: [4, '使用者帳號長度不符'],
+    maxlength: [20, '使用者帳號長度不符'],
     unique: true,
-    validator: {
+    validate: {
       validator (value) {
         return validator.isAlphanumeric(value)
       },
-      message: '使用者帳號只能包含英文或數字'
+      message: '使用者帳號格式錯誤'
     }
   },
   email: {
     type: String,
     required: [true, '缺少使用者信箱'],
     unique: true,
-    validator: {
+    validate: {
       validator (value) {
         return validator.isEmail(value)
       },
-      message: '信箱格式錯誤'
+      message: '使用者信箱格式錯誤'
     }
   },
   password: {
     type: String,
     required: [true, '缺少使用者密碼']
   },
-  token: {
+  tokens: {
     type: [String]
   },
   cart: {
@@ -55,13 +59,21 @@ const schema = new Schema({
   versionKey: false
 })
 
+schema.virtual('cartQuantity')
+  .get(function () {
+    return this.cart.reduce((total, current) => {
+      return total + current.quantity
+    }, 0)
+  })
+
 schema.pre('save', function (next) {
   const user = this
   if (user.isModified('password')) {
     if (user.password.length < 4 || user.password.length > 20) {
       const error = new Error.ValidationError(null)
-      error.addError('password', new Error.ValidationError({ message: '密碼長度不符' }))
+      error.addError('password', new Error.ValidatorError({ message: '密碼長度不符' }))
       next(error)
+      return
     } else {
       user.password = bcrypt.hashSync(user.password, 10)
     }
@@ -69,4 +81,4 @@ schema.pre('save', function (next) {
   next()
 })
 
-export default model('user', schema)
+export default model('users', schema)

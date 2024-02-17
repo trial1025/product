@@ -1,12 +1,9 @@
 import passport from 'passport'
 import { StatusCodes } from 'http-status-codes'
+import jsonwebtoken from 'jsonwebtoken'
 
-// 這個 middleware 會檢查是否有登入
-// 如果沒有登入，會回傳 401
-// 如果有登入，會把 user 資訊放到 req.user
-// 這樣之後的 middleware 或 controller 就可以直接使用 req.user
 export const login = (req, res, next) => {
-  passport.authenticate('local', { session: false }, (error, user, info) => {
+  passport.authenticate('login', { session: false }, (error, user, info) => {
     if (!user || error) {
       if (info.message === 'Missing credentials') {
         res.status(StatusCodes.BAD_REQUEST).json({
@@ -29,6 +26,35 @@ export const login = (req, res, next) => {
       }
     }
     req.user = user
+    next()
+  })(req, res, next)
+}
+
+export const jwt = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, (error, data, info) => {
+    if (error || !data) {
+      if (info instanceof jsonwebtoken.JsonWebTokenError) {
+        // JWT 格式不對、SECRET 不對
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: false,
+          message: 'JWT 無效'
+        })
+      } else if (info.message === '未知錯誤') {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: '未知錯誤'
+        })
+      } else {
+        // 其他錯誤
+        res.status(StatusCodes.UNAUTHORIZED).json({
+          success: false,
+          message: info.message
+        })
+      }
+      return
+    }
+    req.user = data.user
+    req.token = data.token
     next()
   })(req, res, next)
 }
