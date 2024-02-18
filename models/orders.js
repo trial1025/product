@@ -20,9 +20,8 @@ const schema = new Schema({
   },
   cart: {
     type: [cartSchema],
-    validator: {
+    validate: {
       validator (value) {
-        // Array.isArray(value) 檢查是否為陣列
         return Array.isArray(value) && value.length > 0
       },
       message: '購物車不能為空'

@@ -4,9 +4,9 @@ import { StatusCodes } from 'http-status-codes'
 
 export const create = async (req, res) => {
   try {
-    // 檢查購物車是否為空
+    // 檢查購物車有沒有東西
     if (req.user.cart.length === 0) throw new Error('EMPTY')
-    // 檢查商品是否已下架
+    // 檢查有沒有下架商品
     const result = await users.findById(req.user._id, 'cart').populate('cart.product')
     const ok = result.cart.every(item => item.product.sell)
     if (!ok) throw new Error('SELL')
@@ -26,7 +26,7 @@ export const create = async (req, res) => {
     if (error.name === 'EMPTY') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: '購物車不能為空'
+        message: '購物車是空的'
       })
     } else if (error.name === 'SELL') {
       res.status(StatusCodes.BAD_REQUEST).json({
