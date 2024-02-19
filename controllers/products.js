@@ -5,6 +5,7 @@ import validator from 'validator'
 export const create = async (req, res) => {
   try {
     req.body.image = req.file.path
+    req.body.userId = req.user._id
     const result = await products.create(req.body)
     res.status(StatusCodes.OK).json({
       success: true,
