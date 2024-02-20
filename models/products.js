@@ -1,7 +1,10 @@
-import { Schema, model, ObjectId } from 'mongoose'
+import { Schema, model } from 'mongoose'
 
 const schema = new Schema({
-  user: {
+  // account: {
+  //   type: String,
+  //   required: [true, '缺少帳號']
+  // },
   name: {
     type: String,
     required: [true, '缺少商品名稱']
@@ -30,7 +33,8 @@ const schema = new Schema({
     type: Boolean,
     required: [true, '缺少商品上架狀態']
   }
-}, {
+},
+{
   timestamps: true,
   versionKey: false
 })
