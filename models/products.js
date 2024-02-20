@@ -1,11 +1,7 @@
 import { Schema, model, ObjectId } from 'mongoose'
 
 const schema = new Schema({
-  // user: {
-  //   type: ObjectId,
-  //   ref: 'users',
-  //   required: [true, '缺少使用者']
-  // },
+  user: {
   name: {
     type: String,
     required: [true, '缺少商品名稱']
