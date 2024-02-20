@@ -1,6 +1,11 @@
-import { Schema, model } from 'mongoose'
+import { Schema, model, ObjectId } from 'mongoose'
 
 const schema = new Schema({
+  // user: {
+  //   type: ObjectId,
+  //   ref: 'users',
+  //   required: [true, '缺少使用者']
+  // },
   name: {
     type: String,
     required: [true, '缺少商品名稱']
@@ -21,7 +26,7 @@ const schema = new Schema({
     type: String,
     required: [true, '缺少商品分類'],
     enum: {
-      values: ['衣服', '食品', '3C', '遊戲'],
+      values: ['反曲弓', '複合弓', '傳統弓', '箭', '護具', '配件', '其他'],
       message: '商品分類錯誤'
     }
   },
