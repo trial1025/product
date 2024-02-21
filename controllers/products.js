@@ -1,5 +1,6 @@
 import products from '../models/products.js'
 import { StatusCodes } from 'http-status-codes'
+// import users from '../models/users.js'
 import validator from 'validator'
 
 export const create = async (req, res) => {
@@ -37,7 +38,6 @@ export const getAll = async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const regex = new RegExp(req.query.search || '', 'i')
 
-    const result = await products.find().populate('user', 'account')
     const data = await products
       .find({
         $or: [
@@ -45,14 +45,7 @@ export const getAll = async (req, res) => {
           { description: regex }
         ]
       })
-      // const text = 'a'
-      // const obj = { [text]: 1 }
-      // obj.a = 1
       .sort({ [sortBy]: sortOrder })
-      // 如果一頁 10 筆
-      // 第 1 頁 = 0 ~ 10 = 跳過 0 筆 = (1 - 1) * 10
-      // 第 2 頁 = 11 ~ 20 = 跳過 10 筆 = (2 - 1) * 10
-      // 第 3 頁 = 21 ~ 30 = 跳過 20 筆 = (3 - 1) * 10
       .skip((page - 1) * itemsPerPage)
       .limit(itemsPerPage === -1 ? undefined : itemsPerPage)
 
@@ -115,6 +108,45 @@ export const get = async (req, res) => {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: '未知錯誤'
+    })
+  }
+}
+
+// 取得當前使用者的商品
+export const getAccount = async (req, res) => {
+  try {
+    const sortBy = req.query.sortBy || 'createdAt'
+    const sortOrder = parseInt(req.query.sortOrder) || -1
+    const itemsPerPage = parseInt(req.query.itemsPerPage) || 20
+    const page = parseInt(req.query.page) || 1
+    const regex = new RegExp(req.query.search || '', 'i')
+
+    const data = await products
+      .find({
+        account: req.user.account,
+        $or: [
+          { name: regex },
+          { description: regex }
+        ]
+      })
+      .sort({ [sortBy]: sortOrder })
+      .skip((page - 1) * itemsPerPage)
+      .limit(itemsPerPage === -1 ? undefined : itemsPerPage)
+
+    // estimatedDocumentCount() 計算總資料數
+    const total = await products.estimatedDocumentCount()
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: '',
+      result: {
+        data, total
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: '無法取得商品資料aa'
     })
   }
 }
