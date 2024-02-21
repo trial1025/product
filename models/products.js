@@ -1,10 +1,10 @@
 import { Schema, model } from 'mongoose'
 
 const schema = new Schema({
-  // account: {
-  //   type: String,
-  //   required: [true, '缺少帳號']
-  // },
+  account: {
+    type: String,
+    required: [true, '缺少使用者帳號']
+  },
   name: {
     type: String,
     required: [true, '缺少商品名稱']

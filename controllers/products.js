@@ -1,7 +1,6 @@
 import products from '../models/products.js'
 import { StatusCodes } from 'http-status-codes'
 import validator from 'validator'
-import users from '../models/users.js'
 
 export const create = async (req, res) => {
   try {
@@ -38,7 +37,7 @@ export const getAll = async (req, res) => {
     const page = parseInt(req.query.page) || 1
     const regex = new RegExp(req.query.search || '', 'i')
 
-    const result = await productss.find().populate('user', 'account')
+    const result = await products.find().populate('user', 'account')
     const data = await products
       .find({
         $or: [
@@ -137,7 +136,7 @@ export const getId = async (req, res) => {
     if (error.name === 'CastError' || error.message === 'ID') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'ID 格式錯誤'
+        message: 'ID 格式錯誤1'
       })
     } else if (error.message === 'NOT FOUND') {
       res.status(StatusCodes.NOT_FOUND).json({
@@ -168,7 +167,7 @@ export const edit = async (req, res) => {
     if (error.name === 'CastError' || error.message === 'ID') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'ID 格式錯誤'
+        message: 'ID 格式錯誤2'
       })
     } else if (error.message === 'NOT FOUND') {
       res.status(StatusCodes.NOT_FOUND).json({
@@ -205,7 +204,7 @@ export const remove = async (req, res) => {
     if (error.name === 'CastError' || error.message === 'ID') {
       res.status(StatusCodes.BAD_REQUEST).json({
         success: false,
-        message: 'ID 格式錯誤'
+        message: 'ID 格式錯誤3'
       })
     } else if (error.message === 'NOT FOUND') {
       res.status(StatusCodes.NOT_FOUND).json({
