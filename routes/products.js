@@ -10,7 +10,7 @@ router.post('/', auth.jwt, upload, create)
 router.get('/me', auth.jwt, getAccount)
 router.get('/all', auth.jwt, admin, getAll)
 router.patch('/:id', auth.jwt, upload, edit)
-router.get('/:id', auth.jwt, getId)
+router.get('/:id', getId)
 router.delete('/:id', auth.jwt, remove)
 router.get('/', get)
 

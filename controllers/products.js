@@ -226,7 +226,7 @@ export const remove = async (req, res) => {
   try {
     if (!validator.isMongoId(req.params.id)) throw new Error('ID')
 
-    await products.findByIdAndRemove(req.params.id).orFail(new Error('NOT FOUND'))
+    await products.findByIdAndDelete(req.params.id).orFail(new Error('NOT FOUND'))
 
     res.status(StatusCodes.OK).json({
       success: true,
@@ -244,9 +244,10 @@ export const remove = async (req, res) => {
         message: '查無商品'
       })
     } else {
+      console.log(error)
       res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
         success: false,
-        message: '未知錯誤'
+        message: '未知錯誤aa'
       })
     }
   }
