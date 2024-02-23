@@ -80,3 +80,20 @@ export const getAll = async (req, res) => {
     })
   }
 }
+
+// 取得當前使用者的訂單
+export const getAccount = async (req, res) => {
+  try {
+    const result = await orders.find().populate('user', 'account').populate('cart.product')
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: '',
+      result
+    })
+  } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: '未知錯誤'
+    })
+  }
+}
