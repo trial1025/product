@@ -15,6 +15,13 @@ const cartSchema = new Schema({
   }
 })
 
+const loveSchema = new Schema({
+  favorites: [{
+    type: ObjectId,
+    ref: 'products'
+  }]
+})
+
 const schema = new Schema({
   account: {
     type: String,
@@ -50,6 +57,9 @@ const schema = new Schema({
   cart: {
     type: [cartSchema]
   },
+  love: {
+    type: [loveSchema]
+  },
   role: {
     type: Number,
     default: UserRole.USER
@@ -58,14 +68,14 @@ const schema = new Schema({
   timestamps: true,
   versionKey: false
 })
-
+// 數量虛擬欄位
 schema.virtual('cartQuantity')
   .get(function () {
     return this.cart.reduce((total, current) => {
       return total + current.quantity
     }, 0)
   })
-
+// 儲存前將密碼加密
 schema.pre('save', function (next) {
   const user = this
   if (user.isModified('password')) {

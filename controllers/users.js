@@ -91,7 +91,7 @@ export const extend = async (req, res) => {
     })
   }
 }
-
+// 取得使用者資料
 export const getProfile = (req, res) => {
   try {
     res.status(StatusCodes.OK).json({
@@ -175,7 +175,7 @@ export const editCart = async (req, res) => {
     }
   }
 }
-
+// 取得購物車
 export const getCart = async (req, res) => {
   try {
     const result = await users.findById(req.user._id, 'cart').populate('cart.product')
@@ -185,6 +185,45 @@ export const getCart = async (req, res) => {
       result: result.cart
     })
   } catch (error) {
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: '未知錯誤'
+    })
+  }
+}
+// 加入最愛
+export const addFavorite = async (req, res) => {
+  try {
+    const user = await users.findById(req.user._id)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    const productId = req.body.productId
+    if (!user.favorites.includes(productId)) {
+      user.favorites.push(productId)
+      await user.save()
+    }
+    res.status(200).json({ message: 'Add favorite successfully' })
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({ message: 'Internal server error' })
+  }
+}
+// 取得最愛
+export const getFavorite = async (req, res) => {
+  try {
+    const user = await users.findById(req.user._id).populate('favorites')
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: '',
+      result: user.favorites
+    })
+  } catch (error) {
+    console.error(error)
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: '未知錯誤'
