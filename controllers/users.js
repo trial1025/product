@@ -179,6 +179,7 @@ export const editCart = async (req, res) => {
 export const getCart = async (req, res) => {
   try {
     const result = await users.findById(req.user._id, 'cart').populate('cart.product')
+    console.log(result)
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
@@ -195,9 +196,9 @@ export const getCart = async (req, res) => {
 export const addFavorite = async (req, res) => {
   try {
     const user = await users.findById(req.user._id)
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
-    }
+    // if (!user) {
+    //   return res.status(404).json({ message: 'User not found' })
+    // }
 
     const product = req.body.product
     if (!user.favorite.includes(product)) {
@@ -213,14 +214,12 @@ export const addFavorite = async (req, res) => {
 // 取得最愛
 export const getFavorite = async (req, res) => {
   try {
-    const user = await users.findById(req.user._id, 'favorite').populate('favorite.product')
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' })
-    }
+    const result = await users.findById(req.user._id, 'favorite').populate('favorite.product')
+    console.log(result)
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
-      result: user.favorites
+      result: result.favorite
     })
   } catch (error) {
     console.error(error)
