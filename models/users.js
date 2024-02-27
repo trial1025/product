@@ -15,11 +15,11 @@ const cartSchema = new Schema({
   }
 })
 
-const loveSchema = new Schema({
-  favorites: [{
+const favoriteSchema = new Schema({
+  product: {
     type: ObjectId,
     ref: 'products'
-  }]
+  }
 })
 
 const schema = new Schema({
@@ -57,8 +57,8 @@ const schema = new Schema({
   cart: {
     type: [cartSchema]
   },
-  love: {
-    type: [loveSchema]
+  favorite: {
+    type: [favoriteSchema]
   },
   role: {
     type: Number,

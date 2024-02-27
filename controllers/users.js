@@ -199,21 +199,21 @@ export const addFavorite = async (req, res) => {
       return res.status(404).json({ message: 'User not found' })
     }
 
-    const productId = req.body.productId
-    if (!user.favorites.includes(productId)) {
-      user.favorites.push(productId)
+    const product = req.body.product
+    if (!user.favorite.includes(product)) {
+      user.favorite.push(product)
       await user.save()
     }
-    res.status(200).json({ message: 'Add favorite successfully' })
+    res.status(200).json({ message: '加入收藏' })
   } catch (error) {
     console.error(error)
-    res.status(500).json({ message: 'Internal server error' })
+    res.status(500).json({ message: '錯誤' })
   }
 }
 // 取得最愛
 export const getFavorite = async (req, res) => {
   try {
-    const user = await users.findById(req.user._id).populate('favorites')
+    const user = await users.findById(req.user._id, 'favorite').populate('favorite.product')
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }

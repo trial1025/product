@@ -11,7 +11,7 @@ router.patch('/extend', auth.jwt, extend)
 router.get('/me', auth.jwt, getProfile)
 router.patch('/cart', auth.jwt, editCart)
 router.get('/cart', auth.jwt, getCart)
-router.patch('/favorite', auth.jwt, addFavorite)
+router.post('/favorite', auth.jwt, addFavorite)
 router.get('/favorite', auth.jwt, getFavorite)
 
 export default router
