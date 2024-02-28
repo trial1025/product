@@ -18,12 +18,7 @@ const cartSchema = new Schema({
 const favoriteSchema = new Schema({
   product: {
     type: ObjectId,
-    ref: 'products',
-    required: [true, '缺少商品欄位']
-  },
-  quantity: {
-    type: Number,
-    required: [true, '缺少商品數量']
+    ref: 'products'
   }
 })
 

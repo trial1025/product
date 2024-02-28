@@ -179,7 +179,6 @@ export const editCart = async (req, res) => {
 export const getCart = async (req, res) => {
   try {
     const result = await users.findById(req.user._id, 'cart').populate('cart.product')
-    console.log(result)
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
@@ -192,34 +191,38 @@ export const getCart = async (req, res) => {
     })
   }
 }
+
 // 加入最愛
 export const addFavorite = async (req, res) => {
   try {
     const user = await users.findById(req.user._id)
-    // if (!user) {
-    //   return res.status(404).json({ message: 'User not found' })
-    // }
-
-    const product = req.body.product
-    if (!user.favorite.includes(product)) {
-      user.favorite.push(product)
-      await user.save()
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
     }
-    res.status(200).json({ message: '加入收藏' })
+    const product = await products.findById(req.body.product)
+    if (!user.favorite.some(item => item.product.toString() === product._id.toString())) {
+      req.user.favorite.push({
+        product: product._id
+      })
+      await req.user.save()
+    }
+    res.status(200).json({
+      message: '加入收藏'
+    })
   } catch (error) {
     console.error(error)
     res.status(500).json({ message: '錯誤' })
   }
 }
+
 // 取得最愛
 export const getFavorite = async (req, res) => {
   try {
-    const result = await users.findById(req.user._id, 'favorite').populate('favorite.product')
-    console.log(result)
+    const results = await users.findById(req.user._id, 'favorite').populate('favorite.product')
     res.status(StatusCodes.OK).json({
       success: true,
       message: '',
-      result: result.favorite
+      result: results.favorite
     })
   } catch (error) {
     console.error(error)
@@ -227,5 +230,44 @@ export const getFavorite = async (req, res) => {
       success: false,
       message: '未知錯誤'
     })
+  }
+}
+
+// 移除最愛
+export const removeFavorite = async (req, res) => {
+  try {
+    if (!validator.isMongoId(req.params.id)) throw new Error('ID')
+
+    const user = await users.findById(req.user._id)
+    if (!user) throw new Error('NOT FOUND')
+
+    const index = user.favorite.findIndex(item => item.product.toString() === req.params.id)
+    if (index === -1) throw new Error('NOT FOUND')
+
+    user.favorite.splice(index, 1)
+    await user.save()
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: '商品已成功從最愛中移除'
+    })
+  } catch (error) {
+    if (error.name === 'CastError' || error.message === 'ID') {
+      res.status(StatusCodes.BAD_REQUEST).json({
+        success: false,
+        message: 'ID 格式錯誤'
+      })
+    } else if (error.message === 'NOT FOUND') {
+      res.status(StatusCodes.NOT_FOUND).json({
+        success: false,
+        message: '查無商品在最愛列表中'
+      })
+    } else {
+      console.log(error)
+      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: '未知錯誤'
+      })
+    }
   }
 }
