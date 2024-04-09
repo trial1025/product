@@ -241,7 +241,7 @@ export const removeFavorite = async (req, res) => {
     const user = await users.findById(req.user._id)
     if (!user) throw new Error('NOT FOUND')
 
-    const index = user.favorite.findIndex(item => item.product.toString() === req.params.id)
+    const index = user.favorite.findIndex(item => item._id.toString() === req.params.id)
     if (index === -1) throw new Error('NOT FOUND')
 
     user.favorite.splice(index, 1)
